@@ -8,7 +8,7 @@
       <link href="/2020/07/09/hello-world/"/>
       <url>/2020/07/09/hello-world/</url>
       
-        <content type="html"><![CDATA[<h1 id="Hello-World"><a href="#Hello-World" class="headerlink" title="Hello World"></a>Hello World</h1>]]></content>
+        <content type="html"><![CDATA[<h1 id="Hello-World"><a href="#Hello-World" class="headerlink" title="Hello World"></a>Hello World</h1><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">import</span> fnmatch</span><br><span class="line"><span class="keyword">import</span> os</span><br><span class="line"></span><br><span class="line">rootPath = <span class="string">'/'</span></span><br><span class="line">pattern = <span class="string">'*.mp3'</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> root, dirs, files <span class="keyword">in</span> os.walk(rootPath):</span><br><span class="line">    <span class="keyword">for</span> filename <span class="keyword">in</span> fnmatch.filter(files, pattern):</span><br><span class="line">        print( os.path.join(root, filename))</span><br></pre></td></tr></table></figure>]]></content>
       
       
       
