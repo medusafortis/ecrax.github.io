@@ -467,10 +467,16 @@ body {
   -moz-osx-font-smoothing: grayscale;
   -webkit-font-smoothing: antialiased;
 }
+.left {
+  float: right;
+}
+.right {
+  float: left;
+}
 .content {
   position: relative;
-  display: flex;
-  flex-direction: column;
+  flex-wrap: wrap;
+  flex-direction: row;
   min-height: 100%;
   overflow-wrap: break-word;
 }
