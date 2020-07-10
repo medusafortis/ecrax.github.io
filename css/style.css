@@ -466,16 +466,10 @@ body {
   -moz-osx-font-smoothing: grayscale;
   -webkit-font-smoothing: antialiased;
 }
-.left {
-  float: right;
-}
-.right {
-  float: left;
-}
 .content {
   position: relative;
-  flex-wrap: wrap;
-  flex-direction: row;
+  display: flex;
+  flex-direction: column;
   min-height: 100%;
   overflow-wrap: break-word;
 }
