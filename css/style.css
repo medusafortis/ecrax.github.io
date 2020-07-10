@@ -447,6 +447,7 @@ body td {
 }
 ::-webkit-scrollbar-thumb {
   background: #505153;
+  border-radius: 2px;
 }
 ::-webkit-scrollbar-thumb:hover {
   background: #505153;
